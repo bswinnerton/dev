@@ -72,8 +72,8 @@ RUN rm gpg.key
 RUN mkdir -p /home/$USER/dev/
 WORKDIR /home/$USER/dev/
 RUN git clone https://github.com/bswinnerton/dotfiles.git
+RUN ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles
 WORKDIR /home/$USER/dev/dotfiles
-RUN git checkout refactor-install-script #FIXME
 RUN ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles
 RUN ./install
 
