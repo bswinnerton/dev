@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.INNER_GITHUB_TOKEN }}
+      TAILSCALE_KEY: ${{ secrets.TAILSCALE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -t bswinnerton/dev:latest --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg TAILSCALE_KEY=$TAILSCALE_KEY .
+      - name: Tag
+        run: docker tag bswinnerton/dev:latest registry.neptunenetworks.org/bswinnerton/dev
+      - name: Login
+        run: docker login --username $DOCKER_USERNAME --password ${{ secrets.DOCKER_PASSWORD }} $DOCKER_REGISTRY_URL
+      - name: Push
+        run: docker push registry.neptunenetworks.org/bswinnerton/dev:latest
