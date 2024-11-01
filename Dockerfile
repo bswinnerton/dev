@@ -8,13 +8,8 @@
 
 FROM debian:latest
 
-# Set up default user
-RUN useradd -ms /bin/bash brooks
-USER brooks
-WORKDIR /home/brooks/
-
 # Install dev tools
-RUN sudo apt-get update && sudo apt-get install -y \
+RUN apt-get update && apt-get install -y \
     curl \
     fish \
     git \
@@ -32,9 +27,9 @@ RUN sudo apt-get update && sudo apt-get install -y \
 RUN curl -s https://github.com/bswinnerton.keys > ~/.ssh/authorized_keys
 
 # Configure Tailscale
-RUN tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 &
-RUN tailscale login --auth-key $TAILSCALE_KEY
-CMD tailscale up --accept-routes --ssh
+CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 & && \
+    tailscale login --auth-key $TAILSCALE_KEY && \
+    tailscale up --accept-routes --ssh
 
 # Install Ruby
 RUN apt-get install autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
@@ -62,6 +57,11 @@ RUN git clone https://github.com/neptune-networks/infrastructure.git
 RUN git clone https://github.com/neptune-networks/ipguide.git
 RUN git clone https://github.com/neptune-networks/neptune-networks.git
 RUN git clone https://github.com/neptune-networks/network.git
+
+# Set up default user
+RUN useradd -ms /bin/bash brooks
+USER brooks
+WORKDIR /home/brooks/
 
 # Change shell to Fish
 RUN chsh /bin/fish
