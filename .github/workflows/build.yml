@@ -32,8 +32,8 @@ jobs:
             --build-arg USER=$CONTAINER_USER \
             .
       - name: Tag
-        run: docker tag $INNER_GITHUB_ACTOR/dev:latest $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev
+        run: docker tag $CONTAINER_GITHUB_USERNAME/dev:latest $DOCKER_REGISTRY_URL/$CONTAINER_GITHUB_USERNAME/dev
       - name: Login
         run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY
       - name: Push
-        run: docker push $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev:latest
+        run: docker push $DOCKER_REGISTRY/$CONTAINER_GITHUB_USERNAME/dev:latest
