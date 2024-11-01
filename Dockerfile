@@ -48,6 +48,10 @@ RUN nvm install --lts
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
+# Set up default user
+RUN useradd -ms /bin/fish brooks
+USER brooks
+
 # Install dotfiles
 #TODO
 
@@ -60,9 +64,3 @@ WORKDIR /home/brooks/Sites/
 #RUN git clone https://github.com/neptune-networks/ipguide.git
 #RUN git clone https://github.com/neptune-networks/neptune-networks.git
 #RUN git clone https://github.com/neptune-networks/network.git
-
-# Set up default user
-RUN useradd -ms /bin/bash brooks
-USER brooks
-WORKDIR /home/brooks/
-RUN chsh brooks /bin/fish
