@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
 
 # Set up default user
-RUN useradd -ms /bin/bash $USERNAME
-USER $USERNAME
+RUN useradd -ms /bin/bash brooks
+USER brooks
 
 # Pull SSH keys from GitHub
 RUN curl -s https://github.com/$GITHUB_ACTOR.keys > ~/.ssh/authorized_keys
@@ -58,7 +58,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 #TODO
 
 # Clone repositories
-WORKDIR /home/$USERNAME/dev/
+WORKDIR /home/brooks/dev/
 #RUN git clone https://github.com/bswinnerton/dev.git
 #RUN git clone https://github.com/bswinnerton/dotfiles.git
 #RUN git clone https://github.com/neptune-networks/containers.git
@@ -68,4 +68,4 @@ WORKDIR /home/$USERNAME/dev/
 #RUN git clone https://github.com/neptune-networks/network.git
 
 # Change shell to fish
-RUN usermod -s /bin/fish $USERNAME
+RUN usermod -s /bin/fish brooks
