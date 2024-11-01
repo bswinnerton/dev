@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     iperf3 \
     iputils-ping \
     jq \
+    locales \
     mosh \
     mtr \
     neovim \
@@ -40,6 +41,7 @@ RUN useradd -ms /bin/bash "$USER"
 RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Continue as the default user
+RUN chsh -s /bin/fish $USER
 USER $USER
 WORKDIR /home/$USER/
 
