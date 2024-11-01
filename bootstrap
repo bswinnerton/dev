@@ -8,33 +8,16 @@ if [ -f "/home/$USER/.env" ]; then
     export $(grep -v '^#' /home/$USER/.env | xargs)
 fi
 
-# Pull authorized SSH keys from GitHub
-mkdir /home/$USER/.ssh
-curl -s https://github.com/$GITHUB_USERNAME.keys > /home/$USER/.ssh/authorized_keys
-
 # Configure Git
-git config --global user.signingkey $(gpg --homedir /home/$USER/.gnupg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
-git config --global commit.gpgSign true
-git config --global credential.helper 'store --file /home/$USER/.git-credentials'
+git config --global user.name $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user | jq .name)
+git config --global user.email $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails | jq .[0].email)
+git config --global github.user $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user | jq .login)
+git config --global sendemail.smtpUser $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails | jq .[0].email)
 
 # Start Tailscale
 echo "Starting Tailscale..."
 sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
 sudo tailscale up --operator=$USER --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
-
-# Clone commonly used personal repositories
-echo "Cloning commonly used repositories..."
-mkdir -p /home/$USER/dev/neptune-networks/
-cd /home/$USER/dev/
-git clone https://github.com/bswinnerton/dev.git > /dev/null 2>&1
-git clone https://github.com/bswinnerton/dotfiles.git > /dev/null 2>&1
-cd /home/$USER/dev/neptune-networks/
-git clone https://github.com/neptune-networks/containers.git > /dev/null 2>&1
-git clone https://github.com/neptune-networks/infrastructure.git > /dev/null 2>&1
-git clone https://github.com/neptune-networks/ipguide.git > /dev/null 2>&1
-git clone https://github.com/neptune-networks/neptune-networks.git > /dev/null 2>&1
-git clone https://github.com/neptune-networks/network.git > /dev/null 2>&1
-cd ~
 
 # Start interactive shell
 /bin/fish

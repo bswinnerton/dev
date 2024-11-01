@@ -26,5 +26,5 @@ If you want to make a copy of this, you'll need to set a few secrets and reposit
 1. Populate `.env` and `.git-credentials` files
 2. Build Docker container:
   ```
-  docker build -t bswinnerton/dev:latest --build-arg GITHUB_USERNAME=bswinnerton --build-arg USER=brooks .
+  docker build -t bswinnerton/dev:latest --build-arg USER=brooks .
   ```

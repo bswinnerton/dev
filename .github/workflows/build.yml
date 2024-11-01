@@ -31,10 +31,7 @@ jobs:
           echo "TAILSCALE_KEY=CONTAINER_TAILSCALE_KEY" >> .env
       - name: Build
         run: >
-          docker build -t $CONTAINER_GITHUB_USERNAME/dev:latest \
-            --build-arg GITHUB_USERNAME=$CONTAINER_GITHUB_USERNAME \
-            --build-arg USER=$CONTAINER_USER \
-            .
+          docker build -t $CONTAINER_GITHUB_USERNAME/dev:latest --build-arg USER=$CONTAINER_USER .
       - name: Tag
         run: docker tag $CONTAINER_GITHUB_USERNAME/dev:latest $DOCKER_REGISTRY/$CONTAINER_GITHUB_USERNAME/dev
       - name: Login
