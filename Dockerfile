@@ -32,7 +32,7 @@ CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbo
     tailscale up --accept-routes --ssh
 
 # Install Ruby
-RUN apt-get install autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
+RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
 
 # Install Node
