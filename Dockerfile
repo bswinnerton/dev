@@ -51,7 +51,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 WORKDIR /home/brooks/Sites/
 RUN git config --global credential.helper store
 RUN git config --global user.name 'bswinnerton'
-RUN git config --global user.password $GITHUB_DEV_TOKEN
+RUN git config --global user.password $GITHUB_TOKEN
 RUN git clone https://github.com/bswinnerton/dev.git
 RUN git clone https://github.com/bswinnerton/dotfiles.git
 RUN git clone https://github.com/neptune-networks/containers.git
