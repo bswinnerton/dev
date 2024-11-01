@@ -7,7 +7,7 @@
 # - [ ] Create a dev.brooks.network CNAME to the running Tailscale docker container
 
 FROM debian:latest
-SHELL ["/bin/bash", "-c"]
+SHELL ["/bin/bash", "--login", "-c"]
 
 # Install dev tools
 RUN apt-get update && apt-get install -y \
