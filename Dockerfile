@@ -29,7 +29,7 @@ RUN curl -s https://github.com/bswinnerton.keys > ~/.ssh/authorized_keys
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 & && \
     tailscale login --auth-key $TAILSCALE_KEY && \
-    tailscale up --accept-routes --ssh
+    tailscale up --accept-routes --ssh --hostname=dev
 
 # Install Ruby
 RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
