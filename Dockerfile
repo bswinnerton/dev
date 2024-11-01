@@ -65,4 +65,4 @@ WORKDIR /home/brooks/Sites/
 RUN useradd -ms /bin/bash brooks
 USER brooks
 WORKDIR /home/brooks/
-RUN chsh /bin/fish
+RUN chsh /bin/fish brooks
