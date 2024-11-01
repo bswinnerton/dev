@@ -58,7 +58,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 #TODO
 
 # Clone repositories
-WORKDIR /home/$USER/Sites/
+WORKDIR /home/$USER/dev/
 #RUN git clone https://github.com/bswinnerton/dev.git
 #RUN git clone https://github.com/bswinnerton/dotfiles.git
 #RUN git clone https://github.com/neptune-networks/containers.git
