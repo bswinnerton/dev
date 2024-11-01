@@ -20,17 +20,24 @@ RUN apt-get update && apt-get install -y \
     mosh \
     openssh-server \
     rbenv \
+    sudo \
     tcpdump \
     tmux
 
 # Install rbenv dependencies
 RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
 
+# Install Tailscale
+COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /usr/local/bin/tailscaled
+COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscale /usr/local/bin/tailscale
+RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
+
 # Set up default user
 RUN useradd -ms /bin/bash brooks
+RUN echo "brooks ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER brooks
 
-# Pull SSH keys from GitHub
+# Pull authorized SSH keys from GitHub
 RUN mkdir ~/.ssh
 RUN curl -s https://github.com/$GITHUB_ACTOR.keys > ~/.ssh/authorized_keys
 
@@ -38,24 +45,22 @@ RUN curl -s https://github.com/$GITHUB_ACTOR.keys > ~/.ssh/authorized_keys
 RUN git config --global credential.helper 'store --file ~/.git-credentials'
 RUN echo "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com" > ~/.git-credentials
 
-# Install & Configure Tailscale
-USER root
-RUN curl -fsSL https://tailscale.com/install.sh | sh
-USER brooks
-CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 & && \
-    tailscale login --auth-key $TAILSCALE_KEY && \
-    tailscale up --accept-routes --ssh --hostname=dev
+# Store secrets in .env file
+ARG GITHUB_TOKEN
+ARG TAILSCALE_KEY
+RUN echo "TAILSCALE_KEY=${TAILSCALE_KEY}" >> /home/brooks/.env && \
+    echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> /home/brooks/.env
+
+# Install Rust
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Install Ruby
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
 
 # Install Node
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash
-RUN source ~/.nvm/nvm.sh
-RUN nvm install --lts
-
-# Install Rust
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+#RUN source ~/.nvm/nvm.sh
+#RUN nvm install --lts
 
 # Install dotfiles
 #TODO
@@ -70,5 +75,6 @@ WORKDIR /home/brooks/dev/
 #RUN git clone https://github.com/neptune-networks/neptune-networks.git
 #RUN git clone https://github.com/neptune-networks/network.git
 
-# Change shell to fish
-RUN usermod -s /bin/fish brooks
+WORKDIR /home/brooks/
+COPY bootstrap /usr/local/bin/bootstrap
+ENTRYPOINT /usr/local/bin/bootstrap

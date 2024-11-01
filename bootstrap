@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Capture the user to run as
+SUDO_USER=$(whoami)
+
+# Load secrets from ~/.env
+if [ -f "/home/$SUDO_USER/.env" ]; then
+    export $(grep -v '^#' /home/$SUDO_USER/.env | xargs)
+fi
+
+# Start Tailscale
+echo "Starting Tailscale..."
+sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
+sudo tailscale up --operator=$SUDO_USER --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
+
+# Start interactive shell
+/bin/fish
+
+# Remove ephemeral Tailscale node
+echo "Logging out of Tailscale..."
+tailscale logout
