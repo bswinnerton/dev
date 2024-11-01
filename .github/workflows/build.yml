@@ -9,23 +9,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      INNER_GITHUB_ACTOR: ${{ github.actor }}
-      INNER_GITHUB_TOKEN: ${{ secrets.INNER_GITHUB_TOKEN }}
+      CONTAINER_GITHUB_TOKEN: ${{ secrets.CONTAINER_GITHUB_TOKEN }}
+      CONTAINER_GITHUB_USERNAME: ${{ github.actor }}
+      CONTAINER_TAILSCALE_KEY: ${{ secrets.CONTAINER_TAILSCALE_KEY }}
+      CONTAINER_USER: ${{ vars.CONTAINER_USER }}
+      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      TAILSCALE_KEY: ${{ secrets.TAILSCALE_KEY }}
-      USERNAME: ${{ vars.USERNAME }}
+      DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
     steps:
       - uses: actions/checkout@v4
+      - name: Create .git-credentials file
+        run: |
+          echo "https://$CONTAINER_GITHUB_USERNAME:$CONTAINER_GITHUB_TOKEN@github.com" >> .git-credentials
+      - name: Create .env file
+        run: |
+          cp env.example .env
+          echo "TAILSCALE_KEY=CONTAINER_TAILSCALE_KEY" >> .env
       - name: Build
         run: >
-          docker build -t $INNER_GITHUB_ACTOR/dev:latest \
-            --build-arg GITHUB_ACTOR=$INNER_GITHUB_ACTOR \
-            --build-arg GITHUB_TOKEN=$INNER_GITHUB_TOKEN \
-            --build-arg TAILSCALE_KEY=$TAILSCALE_KEY \
-            --build-arg USERNAME=$USERNAME .
+          docker build -t $CONTAINER_GITHUB_USERNAME/dev:latest \
+            --build-arg GITHUB_USERNAME=$CONTAINER_GITHUB_USERNAME
+            --build-arg USER=$CONTAINER_USER
+            .
       - name: Tag
         run: docker tag $INNER_GITHUB_ACTOR/dev:latest $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev
       - name: Login
-        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY_URL
+        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY
       - name: Push
         run: docker push $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev:latest

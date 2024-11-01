@@ -1,11 +1,3 @@
-# TODO:
-# - [x] Create ephemeral (but named?) Tailscale key
-# - Add secrets in GitHub for:
-#   - [x] Tailscale key
-#   - [x] Neptune's Docker registry
-#   - [x] GitHub to pull repos
-# - [ ] Create a dev.brooks.network CNAME to the running Tailscale docker container
-
 FROM debian:latest
 SHELL ["/bin/bash", "--login", "-c"]
 
@@ -16,13 +8,16 @@ RUN apt-get update && apt-get install -y \
     git \
     htop \
     iperf3 \
+    iputils-ping \
     jq \
     mosh \
+    mtr \
     openssh-server \
     rbenv \
     sudo \
     tcpdump \
-    tmux
+    tmux \
+    traceroute
 
 # Install rbenv dependencies
 RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
@@ -32,24 +27,16 @@ COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /usr/
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscale /usr/local/bin/tailscale
 RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 
-# Set up default user
-RUN useradd -ms /bin/bash brooks
-RUN echo "brooks ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-USER brooks
+# Set up the default user
+ARG USER
+ENV USER=$USER
+RUN useradd -ms /bin/bash "$USER"
 
-# Pull authorized SSH keys from GitHub
-RUN mkdir ~/.ssh
-RUN curl -s https://github.com/$GITHUB_ACTOR.keys > ~/.ssh/authorized_keys
+# Allow sudo access
+RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Store GitHub credentials
-RUN git config --global credential.helper 'store --file ~/.git-credentials'
-RUN echo "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com" > ~/.git-credentials
-
-# Store secrets in .env file
-ARG GITHUB_TOKEN
-ARG TAILSCALE_KEY
-RUN echo "TAILSCALE_KEY=${TAILSCALE_KEY}" >> /home/brooks/.env && \
-    echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> /home/brooks/.env
+# Continue as the default user
+USER $USER
 
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
@@ -59,22 +46,14 @@ RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
 
 # Install Node
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash
-#RUN source ~/.nvm/nvm.sh
-#RUN nvm install --lts
+RUN source /home/$USER/.nvm/nvm.sh && nvm install --lts
 
 # Install dotfiles
 #TODO
 
-# Clone repositories
-WORKDIR /home/brooks/dev/
-#RUN git clone https://github.com/bswinnerton/dev.git
-#RUN git clone https://github.com/bswinnerton/dotfiles.git
-#RUN git clone https://github.com/neptune-networks/containers.git
-#RUN git clone https://github.com/neptune-networks/infrastructure.git
-#RUN git clone https://github.com/neptune-networks/ipguide.git
-#RUN git clone https://github.com/neptune-networks/neptune-networks.git
-#RUN git clone https://github.com/neptune-networks/network.git
-
-WORKDIR /home/brooks/
+WORKDIR /home/$USER/
+COPY .env .env
+COPY .git-credentials .git-credentials
 COPY bootstrap /usr/local/bin/bootstrap
+ARG GITHUB_USERNAME
 ENTRYPOINT /usr/local/bin/bootstrap
