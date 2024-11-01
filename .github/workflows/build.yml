@@ -16,8 +16,12 @@ jobs:
       DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       DOCKER_REGISTRY: ${{ vars.DOCKER_REGISTRY }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - name: Set up GPG for Git signing
+        run: |
+          echo "$GPG_PRIVATE_KEY" > gpg.key
       - name: Create .git-credentials file
         run: |
           echo "https://$CONTAINER_GITHUB_USERNAME:$CONTAINER_GITHUB_TOKEN@github.com" >> .git-credentials

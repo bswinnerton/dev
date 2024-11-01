@@ -5,6 +5,7 @@ SHELL ["/bin/bash", "--login", "-c"]
 RUN apt-get update && apt-get install -y \
     curl \
     fish \
+    dnsutils \
     git \
     htop \
     iperf3 \
@@ -37,6 +38,7 @@ RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Continue as the default user
 USER $USER
+WORKDIR /home/$USER/
 
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
@@ -48,12 +50,18 @@ RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash
 RUN source /home/$USER/.nvm/nvm.sh && nvm install --lts
 
-# Install dotfiles
-#TODO
+# Import GPG key
+COPY gpg.key .
+RUN mkdir -p /home/$USER/.gnupg && \
+    chmod 700 /home/$USER/.gnupg && \
+    gpg --batch --import gpg.key && \
+    rm gpg.key
 
-WORKDIR /home/$USER/
-COPY .env .env
-COPY .git-credentials .git-credentials
+# Copy files to ~/
+COPY .env .
+COPY .git-credentials .
 COPY bootstrap /usr/local/bin/bootstrap
+
+# Call the bootstrap script at runtime
 ARG GITHUB_USERNAME
 ENTRYPOINT /usr/local/bin/bootstrap

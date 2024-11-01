@@ -13,6 +13,7 @@ If you want to make a copy of this, you'll need to set a few secrets and reposit
 - `CONTAINER_GITHUB_TOKEN`: A GitHub personal access token so that repositories can be cloned
 - `CONTAINER_TAILSCALE_KEY`: A Tailscale auth key so that the container can connect to your tailnet
 - `DOCKER_PASSWORD`: The password for your private Docker registry
+- `GPG_PRIVATE_KEY`: A GPG private key for signing Git commits
 
 ### Repository variables
 
