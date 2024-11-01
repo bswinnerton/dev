@@ -13,7 +13,7 @@ jobs:
       INNER_GITHUB_TOKEN: ${{ secrets.INNER_GITHUB_TOKEN }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       TAILSCALE_KEY: ${{ secrets.TAILSCALE_KEY }}
-      USERNAME: ${{ env.USERNAME }}
+      USERNAME: ${{ vars.USERNAME }}
     steps:
       - uses: actions/checkout@v4
       - name: Build
