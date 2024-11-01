@@ -31,6 +31,7 @@ RUN useradd -ms /bin/bash brooks
 USER brooks
 
 # Pull SSH keys from GitHub
+RUN mkdir ~/.ssh
 RUN curl -s https://github.com/$GITHUB_ACTOR.keys > ~/.ssh/authorized_keys
 
 # Store GitHub credentials
