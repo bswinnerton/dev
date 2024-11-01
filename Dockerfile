@@ -19,14 +19,14 @@ RUN apt-get update && apt-get install -y \
     mosh \
     openssh-server \
     rbenv \
-    tailscale \
     tcpdump \
     tmux
 
 # Pull SSH keys from GitHub
 RUN curl -s https://github.com/bswinnerton.keys > ~/.ssh/authorized_keys
 
-# Configure Tailscale
+# Install & Configure Tailscale
+RUN curl -fsSL https://tailscale.com/install.sh | sh
 CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 & && \
     tailscale login --auth-key $TAILSCALE_KEY && \
     tailscale up --accept-routes --ssh
