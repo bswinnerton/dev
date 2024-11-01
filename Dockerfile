@@ -26,6 +26,10 @@ RUN apt-get update && apt-get install -y \
 # Pull SSH keys from GitHub
 RUN curl -s https://github.com/bswinnerton.keys > ~/.ssh/authorized_keys
 
+# Store GitHub credentials
+RUN git config --global credential.helper 'store --file ~/.git-credentials'
+RUN echo "https://bswinnerton:$GITHUB_TOKEN@github.com" > ~/.git-credentials
+
 # Install & Configure Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 & && \
@@ -49,9 +53,6 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Clone repositories
 WORKDIR /home/brooks/Sites/
-RUN git config --global credential.helper store
-RUN git config --global user.name 'bswinnerton'
-RUN git config --global user.password $GITHUB_TOKEN
 RUN git clone https://github.com/bswinnerton/dev.git
 RUN git clone https://github.com/bswinnerton/dotfiles.git
 RUN git clone https://github.com/neptune-networks/containers.git
@@ -64,7 +65,4 @@ RUN git clone https://github.com/neptune-networks/network.git
 RUN useradd -ms /bin/bash brooks
 USER brooks
 WORKDIR /home/brooks/
-
-# Change shell to Fish
 RUN chsh /bin/fish
-WORKDIR /home/brooks/
