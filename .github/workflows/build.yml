@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build
-        run: docker build -t $INNER_GITHUB_ACTOR/dev:latest --build-arg GITHUB_ACTOR=$INNER_GITHUB_ACTOR --build-arg GITHUB_TOKEN=$INNER_GITHUB_TOKEN --build-arg TAILSCALE_KEY=$TAILSCALE_KEY --build-arg USERNAME=$USER .
+        run: docker build -t $INNER_GITHUB_ACTOR/dev:latest --build-arg GITHUB_ACTOR=$INNER_GITHUB_ACTOR --build-arg GITHUB_TOKEN=$INNER_GITHUB_TOKEN --build-arg TAILSCALE_KEY=$TAILSCALE_KEY --build-arg USERNAME=$USERNAME .
       - name: Tag
         run: docker tag $INNER_GITHUB_ACTOR/dev:latest $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev
       - name: Login
