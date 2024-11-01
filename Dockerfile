@@ -6,8 +6,6 @@
 #   - [x] GitHub to pull repos
 # - [ ] Create a dev.brooks.network CNAME to the running Tailscale docker container
 
-ARG USERNAME
-
 FROM debian:latest
 SHELL ["/bin/bash", "--login", "-c"]
 
