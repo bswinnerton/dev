@@ -38,6 +38,7 @@ RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
 
 # Install Node
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash
+RUN source ~/.nvm/nvm.sh
 RUN nvm install --lts
 
 # Install Rust
