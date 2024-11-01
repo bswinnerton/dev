@@ -53,13 +53,13 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Clone repositories
 WORKDIR /home/brooks/Sites/
-RUN git clone https://github.com/bswinnerton/dev.git
-RUN git clone https://github.com/bswinnerton/dotfiles.git
-RUN git clone https://github.com/neptune-networks/containers.git
-RUN git clone https://github.com/neptune-networks/infrastructure.git
-RUN git clone https://github.com/neptune-networks/ipguide.git
-RUN git clone https://github.com/neptune-networks/neptune-networks.git
-RUN git clone https://github.com/neptune-networks/network.git
+#RUN git clone https://github.com/bswinnerton/dev.git
+#RUN git clone https://github.com/bswinnerton/dotfiles.git
+#RUN git clone https://github.com/neptune-networks/containers.git
+#RUN git clone https://github.com/neptune-networks/infrastructure.git
+#RUN git clone https://github.com/neptune-networks/ipguide.git
+#RUN git clone https://github.com/neptune-networks/neptune-networks.git
+#RUN git clone https://github.com/neptune-networks/network.git
 
 # Set up default user
 RUN useradd -ms /bin/bash brooks
