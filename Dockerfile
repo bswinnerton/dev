@@ -39,7 +39,9 @@ RUN git config --global credential.helper 'store --file ~/.git-credentials'
 RUN echo "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com" > ~/.git-credentials
 
 # Install & Configure Tailscale
+USER root
 RUN curl -fsSL https://tailscale.com/install.sh | sh
+USER brooks
 CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 & && \
     tailscale login --auth-key $TAILSCALE_KEY && \
     tailscale up --accept-routes --ssh --hostname=dev
