@@ -1,5 +1,5 @@
 # TODO:
-# - [ ] Create ephemeral (but named?) Tailscale key
+# - [x] Create ephemeral (but named?) Tailscale key
 # - Add secrets in GitHub for:
 #   - [x] Tailscale key
 #   - [x] Neptune's Docker registry
@@ -7,6 +7,7 @@
 # - [ ] Create a dev.brooks.network CNAME to the running Tailscale docker container
 
 FROM debian:latest
+SHELL ["/bin/bash", "-c"]
 
 # Install dev tools
 RUN apt-get update && apt-get install -y \
