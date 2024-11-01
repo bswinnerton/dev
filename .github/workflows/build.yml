@@ -9,17 +9,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      ACTOR: ${{ github.actor }}
+      INNER_GITHUB_ACTOR: ${{ github.actor }}
       INNER_GITHUB_TOKEN: ${{ secrets.INNER_GITHUB_TOKEN }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       TAILSCALE_KEY: ${{ secrets.TAILSCALE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Build
-        run: docker build -t $ACTOR/dev:latest --build-arg GITHUB_TOKEN=$INNER_GITHUB_TOKEN --build-arg TAILSCALE_KEY=$TAILSCALE_KEY .
+        run: docker build -t $INNER_GITHUB_ACTOR/dev:latest --build-arg GITHUB_ACTOR=$INNER_GITHUB_ACTOR --build-arg GITHUB_TOKEN=$INNER_GITHUB_TOKEN --build-arg TAILSCALE_KEY=$TAILSCALE_KEY --build-arg USER=$USER .
       - name: Tag
-        run: docker tag $ACTOR/dev:latest $DOCKER_REGISTRY_URL/$ACTOR/dev
+        run: docker tag $INNER_GITHUB_ACTOR/dev:latest $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev
       - name: Login
         run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY_URL
       - name: Push
-        run: docker push $DOCKER_REGISTRY_URL/$ACTOR/dev:latest
+        run: docker push $DOCKER_REGISTRY_URL/$INNER_GITHUB_ACTOR/dev:latest

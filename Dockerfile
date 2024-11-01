@@ -23,12 +23,19 @@ RUN apt-get update && apt-get install -y \
     tcpdump \
     tmux
 
+# Install rbenv dependencies
+RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
+
+# Set up default user
+RUN useradd -ms /bin/bash $USER
+USER $USER
+
 # Pull SSH keys from GitHub
-RUN curl -s https://github.com/bswinnerton.keys > ~/.ssh/authorized_keys
+RUN curl -s https://github.com/$GITHUB_ACTOR.keys > ~/.ssh/authorized_keys
 
 # Store GitHub credentials
 RUN git config --global credential.helper 'store --file ~/.git-credentials'
-RUN echo "https://bswinnerton:$GITHUB_TOKEN@github.com" > ~/.git-credentials
+RUN echo "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com" > ~/.git-credentials
 
 # Install & Configure Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
@@ -37,7 +44,6 @@ CMD tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbo
     tailscale up --accept-routes --ssh --hostname=dev
 
 # Install Ruby
-RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
 
 # Install Node
@@ -48,15 +54,11 @@ RUN nvm install --lts
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-# Set up default user
-RUN useradd -ms /bin/fish brooks
-USER brooks
-
 # Install dotfiles
 #TODO
 
 # Clone repositories
-WORKDIR /home/brooks/Sites/
+WORKDIR /home/$USER/Sites/
 #RUN git clone https://github.com/bswinnerton/dev.git
 #RUN git clone https://github.com/bswinnerton/dotfiles.git
 #RUN git clone https://github.com/neptune-networks/containers.git
@@ -64,3 +66,6 @@ WORKDIR /home/brooks/Sites/
 #RUN git clone https://github.com/neptune-networks/ipguide.git
 #RUN git clone https://github.com/neptune-networks/neptune-networks.git
 #RUN git clone https://github.com/neptune-networks/network.git
+
+# Change shell to fish
+RUN usermod -s /bin/fish $USER
