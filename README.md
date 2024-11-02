@@ -23,7 +23,7 @@ If you want to make a copy of this, you'll need to set a few secrets and reposit
 
 ## To build locally
 
-1. Populate `.env` and `.git-credentials` files
+1. Populate the `.env`,`.git-credentials` and `gpg.key` files
 2. Build Docker container:
   ```
   docker build -t bswinnerton/dev:latest --build-arg USER=brooks .
