@@ -36,7 +36,7 @@ RUN apt-get update && \
     apt-get install -y locales && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-ENV LANG en_US.utf8
+ENV LANG=en_US.utf8
 
 # Install Tailscale
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /usr/local/bin/tailscaled
@@ -46,28 +46,26 @@ RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 # Set up the default user
 ARG USER
 ENV USER=$USER
-RUN useradd -ms /bin/bash "$USER"
-
-# Allow sudo access
-RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
-# Continue as the default user
-RUN chsh -s /bin/fish $USER
+RUN \
+    useradd -ms /bin/bash "$USER" && \
+    echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    chsh -s /bin/fish $USER
 USER $USER
-WORKDIR /home/$USER/
 
-# Install Rust
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-
-# Install Ruby
-RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
-RUN rbenv global $(rbenv install -l | grep -v - | tail -1)
-
-# Install Node
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash
-RUN source /home/$USER/.nvm/nvm.sh && nvm install --lts
+# Install Languages
+RUN \
+    # Rust
+    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    # Ruby
+    rbenv install $(rbenv install -l | grep -v - | tail -1) && \
+    rbenv global $(rbenv install -l | grep -v - | tail -1) && \
+    # Node
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash && \
+    source /home/$USER/.nvm/nvm.sh && \
+    nvm install --lts
 
 # Copy files to ~/
+WORKDIR /home/$USER/
 COPY .env .
 COPY .git-credentials .
 
@@ -77,34 +75,41 @@ RUN curl -s https://github.com/$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN
 
 # Import GPG key
 COPY gpg.key .
-RUN mkdir -p /home/$USER/.gnupg
-RUN chmod 700 /home/$USER/.gnupg
-RUN gpg --batch --import gpg.key
+RUN \
+    mkdir -p /home/$USER/.gnupg && \
+    chmod 700 /home/$USER/.gnupg && \
+    gpg --batch --import gpg.key
+
+USER root
 RUN rm gpg.key
+USER $USER
 
 # Install dotfiles
-RUN mkdir -p /home/$USER/dev/
-WORKDIR /home/$USER/dev/
-RUN git clone https://github.com/bswinnerton/dotfiles.git
-RUN ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles
-WORKDIR /home/$USER/dev/dotfiles
-RUN ./install
-RUN vim +'PlugInstall --sync' +qa
+RUN \
+    mkdir -p /home/$USER/dev/ && \
+    cd /home/$USER/dev/ && \
+    git clone https://github.com/bswinnerton/dotfiles.git && \
+    ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles && \
+    cd /home/$USER/dev/dotfiles && \
+    ./install && \
+    vim +'PlugInstall --sync' +qa
 
 # Configure Git
-RUN git config --global user.signingkey $(gpg --homedir /home/$USER/.gnupg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
-RUN git config --global commit.gpgSign true
-RUN git config --global credential.helper 'store --file /home/$USER/.git-credentials'
+RUN \
+    git config --global user.signingkey $(gpg --homedir /home/$USER/.gnupg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2) && \
+    git config --global commit.gpgSign true && \
+    git config --global credential.helper 'store --file /home/$USER/.git-credentials'
 
 # Clone commonly used repositories
-RUN mkdir -p /home/$USER/dev/neptune-networks/
-WORKDIR /home/$USER/dev/neptune-networks/
-RUN git clone https://github.com/bswinnerton/dev.git
-RUN git clone https://github.com/neptune-networks/containers.git
-RUN git clone https://github.com/neptune-networks/infrastructure.git
-RUN git clone https://github.com/neptune-networks/ipguide.git
-RUN git clone https://github.com/neptune-networks/neptune-networks.git
-RUN git clone https://github.com/neptune-networks/network.git
+RUN \
+    mkdir -p /home/$USER/dev/neptune-networks && \
+    cd /home/$USER/dev/neptune-networks/ && \
+    git clone https://github.com/bswinnerton/dev.git && \
+    git clone https://github.com/neptune-networks/containers.git && \
+    git clone https://github.com/neptune-networks/infrastructure.git && \
+    git clone https://github.com/neptune-networks/ipguide.git && \
+    git clone https://github.com/neptune-networks/neptune-networks.git && \
+    git clone https://github.com/neptune-networks/network.git
 
 # Call the bootstrap script at runtime
 WORKDIR /home/$USER/
