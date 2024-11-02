@@ -28,7 +28,8 @@ jobs:
       - name: Create .env file
         run: |
           cp env.example .env
-          echo "TAILSCALE_KEY=CONTAINER_TAILSCALE_KEY" >> .env
+          echo "GITHUB_TOKEN=$CONTAINER_GITHUB_TOKEN" >> .env
+          echo "TAILSCALE_KEY=$CONTAINER_TAILSCALE_KEY" >> .env
       - name: Build
         run: >
           docker build -t $CONTAINER_GITHUB_USERNAME/dev:latest --build-arg USER=$CONTAINER_USER .
