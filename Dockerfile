@@ -50,6 +50,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Install Ruby
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1)
+RUN rbenv global $(rbenv install -l | grep -v - | tail -1)
 
 # Install Node
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash
