@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y \
     locales \
     mosh \
     mtr \
-    neovim \
     openssh-server \
     rbenv \
     ripgrep \
@@ -77,7 +76,6 @@ WORKDIR /home/$USER/dev/
 RUN git clone https://github.com/bswinnerton/dotfiles.git
 RUN ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles
 WORKDIR /home/$USER/dev/dotfiles
-RUN ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles
 RUN ./install
 
 # Configure Git
