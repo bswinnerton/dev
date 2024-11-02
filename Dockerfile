@@ -22,7 +22,8 @@ RUN apt-get update && apt-get install -y \
     tcpdump \
     tmux \
     traceroute \
-    universal-ctags
+    universal-ctags \
+    vim
 
 # Install rbenv dependencies
 RUN apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
@@ -78,6 +79,7 @@ RUN git clone https://github.com/bswinnerton/dotfiles.git
 RUN ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles
 WORKDIR /home/$USER/dev/dotfiles
 RUN ./install
+RUN vim +'PlugInstall --sync' +qa
 
 # Configure Git
 RUN git config --global user.signingkey $(gpg --homedir /home/$USER/.gnupg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
