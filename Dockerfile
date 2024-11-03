@@ -62,7 +62,8 @@ RUN \
     # Node
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash && \
     source /home/$USER/.nvm/nvm.sh && \
-    nvm install --lts
+    nvm install --lts && \
+    npm install yarn
 
 # Copy files to ~/
 WORKDIR /home/$USER/
