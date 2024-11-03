@@ -26,10 +26,10 @@ mkdir -p /home/$USER/.ssh
 curl -s https://github.com/$(echo $GITHUB_USER | jq -r .login).keys > /home/$USER/.ssh/authorized_keys
 
 # Configure Git
-git config --global user.name $(echo $GITHUB_USER | jq .name)
-git config --global user.email $(echo $GITHUB_EMAILS | jq .[0].email)
-git config --global github.user $(echo $GITHUB_USER | jq .login)
-git config --global sendemail.smtpUser $(echo $GITHUB_EMAILS | jq .[0].email)
+git config --global user.name "$(echo $GITHUB_USER | jq .name)"
+git config --global user.email "$(echo $GITHUB_EMAILS | jq .[0].email)"
+git config --global github.user "$(echo $GITHUB_USER | jq .login)"
+git config --global sendemail.smtpUser "$(echo $GITHUB_EMAILS | jq .[0].email)"
 
 # Start Tailscale
 echo "Starting Tailscale..."
