@@ -100,6 +100,7 @@ RUN \
 # Clone commonly used repositories
 RUN \
     mkdir -p /home/$USER/dev/neptune-networks && \
+    cd /home/$USER/dev/
     git clone https://github.com/bswinnerton/dev.git && \
     cd /home/$USER/dev/neptune-networks/ && \
     git clone https://github.com/neptune-networks/containers.git && \
