@@ -17,13 +17,13 @@ if [ -f "/home/$USER/.env" ]; then
     export $(grep -v '^#' /home/$USER/.env | xargs)
 fi
 
-# Import authorized SSH keys
-mkdir /home/$USER/.ssh
-curl -s https://github.com/$(echo $GITHUB_USER | jq -r .login).keys > /home/$USER/.ssh/authorized_keys
-
 # Call GitHub API
 GITHUB_USER=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user)
 GITHUB_EMAILS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails)
+
+# Import authorized SSH keys
+mkdir /home/$USER/.ssh
+curl -s https://github.com/$(echo $GITHUB_USER | jq -r .login).keys > /home/$USER/.ssh/authorized_keys
 
 # Configure Git
 git config --global user.name $(echo $GITHUB_USER | jq .name)
