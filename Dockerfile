@@ -62,8 +62,7 @@ RUN \
     # Node
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash && \
     source /home/$USER/.nvm/nvm.sh && \
-    nvm install --lts && \
-    npm install yarn
+    nvm install --lts
 
 # Copy files to ~/
 WORKDIR /home/$USER/
@@ -89,6 +88,7 @@ RUN \
     ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles && \
     cd /home/$USER/dev/dotfiles && \
     ./install && \
+    npm install yarn && \
     vim +'PlugInstall --sync' +qa
 
 # Configure Git
