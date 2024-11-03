@@ -69,10 +69,6 @@ WORKDIR /home/$USER/
 COPY .env .
 COPY .git-credentials .
 
-# Import authorized SSH keys
-RUN mkdir /home/$USER/.ssh
-RUN curl -s https://github.com/$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user | jq -r .login).keys > /home/$USER/.ssh/authorized_keys
-
 # Import GPG key
 COPY gpg.key .
 RUN \
