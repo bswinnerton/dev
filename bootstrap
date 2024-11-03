@@ -3,16 +3,24 @@
 # Capture the user to run as
 USER=$(whoami)
 
+# Call GitHub API
+GITHUB_USER=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user)
+GITHUB_EMAILS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails)
+
+# Import authorized SSH keys
+mkdir /home/$USER/.ssh
+curl -s https://github.com/$(echo $GITHUB_USER | jq -r .login).keys > /home/$USER/.ssh/authorized_keys
+
 # Load secrets from ~/.env
 if [ -f "/home/$USER/.env" ]; then
     export $(grep -v '^#' /home/$USER/.env | xargs)
 fi
 
 # Configure Git
-git config --global user.name $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user | jq .name)
-git config --global user.email $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails | jq .[0].email)
-git config --global github.user $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user | jq .login)
-git config --global sendemail.smtpUser $(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails | jq .[0].email)
+git config --global user.name $(echo $GITHUB_USER | jq .name)
+git config --global user.email $(echo $GITHUB_EMAILS | jq .[0].email)
+git config --global github.user $(echo $GITHUB_USER | jq .login)
+git config --global sendemail.smtpUser $(echo $GITHUB_EMAILS | jq .[0].email)
 
 # Start Tailscale
 echo "Starting Tailscale..."
