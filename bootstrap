@@ -10,7 +10,7 @@ teardown() {
 trap teardown SIGTERM SIGINT
 
 # Load secrets from ~/.env
-if [ -f "~/.env" ]; then
+if [ -f ~/.env ]; then
     export $(grep -v '^#' ~/.env | xargs)
 fi
 
