@@ -9,36 +9,41 @@ teardown() {
 # Set trap for SIGTERM and SIGINT
 trap teardown SIGTERM SIGINT
 
-# Check if the script has run before
-BOOTSTRAPPED="/tmp/.bootstrapped"
-if [ ! -f "$BOOTSTRAPPED" ]; then
-    # Load secrets from ~/.env
-    if [ -f "~/.env" ]; then
-        export $(grep -v '^#' ~/.env | xargs)
-    fi
+# Capture the user to run as
+USER=$(whoami)
 
-    # Call GitHub API
-    GITHUB_USER=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user)
-    GITHUB_EMAILS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails)
-
-    # Import authorized SSH keys
-    mkdir -p ~/.ssh
-    curl -s https://github.com/$(echo $GITHUB_USER | jq -r .login).keys > ~/.ssh/authorized_keys
-
-    # Configure Git
-    git config --global user.name "$(echo $GITHUB_USER | jq .name)"
-    git config --global user.email "$(echo $GITHUB_EMAILS | jq .[0].email)"
-    git config --global github.user "$(echo $GITHUB_USER | jq .login)"
-    git config --global sendemail.smtpUser "$(echo $GITHUB_EMAILS | jq .[0].email)"
-
-    # Start Tailscale
-    echo "Starting Tailscale..."
-    sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
-    sudo tailscale up --operator=$(whoami) --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
-
-    # Create marker file to indicate the script has run
-    touch "$BOOTSTRAPPED"
+# Load secrets from ~/.env
+if [ -f "/home/$USER/.env" ]; then
+    export $(grep -v '^#' /home/$USER/.env | xargs)
 fi
 
-# Start interactive shell
-/bin/fish
+# Call GitHub API
+GITHUB_USER=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user)
+GITHUB_EMAILS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user/emails)
+
+# Import authorized SSH keys
+mkdir -p /home/$USER/.ssh
+curl -s https://github.com/$(echo $GITHUB_USER | jq -r .login).keys > /home/$USER/.ssh/authorized_keys
+
+# Configure Git
+git config --global user.name "$(echo $GITHUB_USER | jq .name)"
+git config --global user.email "$(echo $GITHUB_EMAILS | jq .[0].email)"
+git config --global github.user "$(echo $GITHUB_USER | jq .login)"
+git config --global sendemail.smtpUser "$(echo $GITHUB_EMAILS | jq .[0].email)"
+
+# Start Tailscale
+echo "Starting Tailscale..."
+sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
+sudo tailscale up --operator=$USER --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
+
+# Check if Docker allocated a TTY (interactive mode) or not (daemonized mode)
+if [ -t 0 ]; then
+    # Interactive mode, open fish
+    /bin/fish
+else
+    # Daemonized mode, run an indefinite loop
+    while true; do sleep 86400; done
+fi
+
+# Remove ephemeral Tailscale node
+teardown
