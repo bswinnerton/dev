@@ -1,5 +1,14 @@
 #!/bin/sh
 
+# Define teardown function
+teardown() {
+    echo "Logging out of Tailscale..."
+    tailscale logout
+}
+
+# Set trap for SIGTERM and SIGINT
+trap teardown SIGTERM SIGINT
+
 # Capture the user to run as
 USER=$(whoami)
 
@@ -31,5 +40,4 @@ sudo tailscale up --operator=$USER --auth-key=$TAILSCALE_KEY --accept-routes --s
 /bin/fish
 
 # Remove ephemeral Tailscale node
-echo "Logging out of Tailscale..."
-tailscale logout
+teardown
