@@ -43,7 +43,7 @@ jobs:
           push: true
           context: .
           tags: ${{ vars.DOCKER_REGISTRY }}/${{ github.actor }}/dev:latest
-          cache-from: type=registry,ref=${{ github.actor }}/dev:latest
-          cache-to: type=registry,ref=${{ github.actor }}/dev:latest,mode=max
+          cache-from: type=registry,ref=${{ vars.DOCKER_REGISTRY }}/${{ github.actor }}/dev:latest
+          cache-to: type=registry,ref=${{ vars.DOCKER_REGISTRY }}/${{ github.actor }}/dev:latest,mode=max
           build-args: |
             USER=${{ vars.CONTAINER_USER }}
