@@ -54,15 +54,15 @@ USER $USER
 SHELL ["/bin/bash", "--login", "-c", "-i"]
 WORKDIR /home/$USER/
 
-# Install Rust
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-
-# Install Ruby
-RUN rbenv install $(rbenv install -l | grep -v - | tail -1) && \
-    rbenv global $(rbenv install -l | grep -v - | tail -1)
-
-# Install Node
-RUN curl -fsSL https://fnm.vercel.app/install | bash && \
+# Install Languages
+RUN \
+    # Install Rust
+    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    # Install Ruby
+    rbenv install $(rbenv install -l | grep -v - | tail -1) && \
+    rbenv global $(rbenv install -l | grep -v - | tail -1) && \
+    # Install Node
+    curl -fsSL https://fnm.vercel.app/install | bash && \
     source /home/$USER/.bashrc && \
     fnm install --lts && \
     npm install -g yarn
