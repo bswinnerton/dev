@@ -45,6 +45,6 @@ jobs:
           context: .
           tags: ${{ vars.DOCKER_REGISTRY }}/${{ github.actor }}/dev:latest
           cache-from: type=registry,ref=${{ github.actor }}/dev:latest
-          cache-to: type=inline
+          cache-to: type=registry,ref=${{ github.actor }}/dev:latest,mode=max
           build-args: |
             USER=${{ vars.CONTAINER_USER }}
