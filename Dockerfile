@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     fish \
     dnsutils \
     git \
+    golang \
     htop \
     iperf3 \
     iproute2 \
@@ -46,7 +47,7 @@ USER $USER
 WORKDIR /home/$USER/
 
 # Install Rust
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Install Ruby
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1) && \
