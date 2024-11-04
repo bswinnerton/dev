@@ -26,7 +26,6 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: actions/checkout@v4
       - name: Set up GPG for Git signing
         run: |
           echo "$GPG_PRIVATE_KEY" > gpg.key
