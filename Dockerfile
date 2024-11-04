@@ -26,9 +26,7 @@ RUN apt-get update && apt-get install -y \
     traceroute \
     universal-ctags \
     vim \
-    wget \
-    # rbenv dependencies
-    autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev && \
+    wget && \
     # Clean up apt cache to save space
     apt-get clean && rm -rf /var/lib/apt/lists*
 
