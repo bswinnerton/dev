@@ -25,11 +25,11 @@ RUN apt-get update && apt-get install -y \
     tmux \
     traceroute \
     universal-ctags \
-    vim && \
+    vim \
+    # rbenv dependencies
+    autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev && \
+    # Clean up apt cache to save space
     apt-get clean && rm -rf /var/lib/apt/lists*
-
-# Install rbenv dependencies
-RUN apt-get update && apt-get install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev && apt-get clean && rm -rf /var/lib/apt/lists*
 
 # Generate locales
 RUN apt-get update && \
@@ -45,12 +45,18 @@ RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 
 # Set up the default user
 ARG USER
-ENV USER=$USER
 RUN \
     useradd -ms /bin/bash "$USER" && \
-    echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    chsh -s /bin/fish $USER
+    echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER $USER
+
+# Temporarily use interactive shell so that ~/.bashrc can be sourced
+SHELL ["/bin/bash", "--login", "-c", "-i"]
+WORKDIR /home/$USER/
+
+# Copy secrets into container
+COPY .env .
+COPY .git-credentials .
 
 # Install Languages
 RUN \
@@ -60,14 +66,13 @@ RUN \
     rbenv install $(rbenv install -l | grep -v - | tail -1) && \
     rbenv global $(rbenv install -l | grep -v - | tail -1) && \
     # Node
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$(curl -s "https://api.github.com/repos/nvm-sh/nvm/tags" | jq -r '.[0].name')/install.sh | bash && \
-    source /home/$USER/.nvm/nvm.sh && \
-    nvm install --lts
+    curl -fsSL https://fnm.vercel.app/install | bash && \
+    source /home/$USER/.bashrc && \
+    fnm install --lts && \
+    npm install -g yarn
 
-# Copy files to ~/
-WORKDIR /home/$USER/
-COPY .env .
-COPY .git-credentials .
+# Go back to non-interactive shell
+SHELL ["/bin/bash", "--login", "-c"]
 
 # Import GPG key
 COPY gpg.key .
@@ -75,7 +80,6 @@ RUN \
     mkdir -p /home/$USER/.gnupg && \
     chmod 700 /home/$USER/.gnupg && \
     gpg --batch --import gpg.key
-
 USER root
 RUN rm gpg.key
 USER $USER
@@ -88,7 +92,6 @@ RUN \
     ln -s /home/$USER/dev/dotfiles /home/$USER/.dotfiles && \
     cd /home/$USER/dev/dotfiles && \
     ./install && \
-    npm install yarn && \
     vim +'PlugInstall --sync' +qa
 
 # Configure Git
@@ -111,5 +114,6 @@ RUN \
 
 # Call the bootstrap script at runtime
 WORKDIR /home/$USER/
+RUN sudo chsh -s /bin/fish $USER
 COPY bootstrap /usr/local/bin/bootstrap
 ENTRYPOINT /usr/local/bin/bootstrap
