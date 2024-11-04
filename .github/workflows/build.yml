@@ -21,7 +21,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login
-        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up GPG for Git signing
         run: |
@@ -38,8 +42,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: $DOCKER_REGISTRY/$CONTAINER_GITHUB_USERNAME/dev:latest
-          cache-from: type=registry,ref=$CONTAINER_GITHUB_USERNAME/dev:latest
+          tags: ${{ vars.DOCKER_REGISTRY }}/${{ github.actor }}/dev:latest
+          cache-from: type=registry,ref=${{ github.actor }}/dev:latest
           cache-to: type=inline
           build-args: |
-            USER=$CONTAINER_USER
+            USER=${{ vars.CONTAINER_USER }}
