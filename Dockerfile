@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     fish \
     dnsutils \
     git \
-    golang \
     htop \
     iperf3 \
     iproute2 \
