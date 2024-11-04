@@ -46,7 +46,7 @@ USER $USER
 WORKDIR /home/$USER/
 
 # Install Rust
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal
 
 # Install Ruby
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1) && \
