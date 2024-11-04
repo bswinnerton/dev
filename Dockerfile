@@ -54,19 +54,15 @@ USER $USER
 SHELL ["/bin/bash", "--login", "-c", "-i"]
 WORKDIR /home/$USER/
 
-# Copy secrets into container
-COPY .env .
-COPY .git-credentials .
+# Install Rust
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-# Install Languages
-RUN \
-    # Rust
-    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
-    # Ruby
-    rbenv install $(rbenv install -l | grep -v - | tail -1) && \
-    rbenv global $(rbenv install -l | grep -v - | tail -1) && \
-    # Node
-    curl -fsSL https://fnm.vercel.app/install | bash && \
+# Install Ruby
+RUN rbenv install $(rbenv install -l | grep -v - | tail -1) && \
+    rbenv global $(rbenv install -l | grep -v - | tail -1)
+
+# Install Node
+RUN curl -fsSL https://fnm.vercel.app/install | bash && \
     source /home/$USER/.bashrc && \
     fnm install --lts && \
     npm install -g yarn
@@ -83,6 +79,10 @@ RUN \
 USER root
 RUN rm gpg.key
 USER $USER
+
+# Copy secrets into container
+COPY .env .
+COPY .git-credentials .
 
 # Install dotfiles
 RUN \
