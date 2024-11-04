@@ -1,5 +1,5 @@
 FROM debian:latest
-SHELL ["/bin/bash", "--login", "-c"]
+SHELL ["/bin/bash", "--login", "-c", "-i"]
 
 # Install dev tools
 RUN apt-get update && apt-get install -y \
@@ -49,9 +49,6 @@ RUN \
     useradd -ms /bin/bash "$USER" && \
     echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER $USER
-
-# Temporarily use interactive shell so that ~/.bashrc can be sourced
-SHELL ["/bin/bash", "--login", "-c", "-i"]
 WORKDIR /home/$USER/
 
 # Install Languages
@@ -66,9 +63,6 @@ RUN \
     source /home/$USER/.bashrc && \
     fnm install --lts && \
     npm install -g yarn
-
-# Go back to non-interactive shell
-SHELL ["/bin/bash", "--login", "-c"]
 
 # Import GPG key
 COPY gpg.key .
