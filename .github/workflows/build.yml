@@ -42,6 +42,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          context: .
           tags: ${{ vars.DOCKER_REGISTRY }}/${{ github.actor }}/dev:latest
           cache-from: type=registry,ref=${{ github.actor }}/dev:latest
           cache-to: type=inline
