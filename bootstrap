@@ -1,9 +1,12 @@
 #!/bin/bash
 
+set -e
+
 # Define teardown function
 teardown() {
-    echo "Logging out of Tailscale..."
+    echo "Stopping Tailscale..."
     tailscale logout
+    exit 0
 }
 
 # Set trap for SIGTERM and SIGINT
@@ -33,14 +36,13 @@ echo "Starting Tailscale..."
 sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
 sudo tailscale up --operator=$(whoami) --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
 
-# Check if Docker allocated a TTY (interactive mode) or not (daemonized mode)
-if [ -t 0 ]; then
-    # Interactive mode, open fish
-    /bin/fish
+# Check if a TTY is attached (i.e., `docker run -it`)
+if [ -t 0 ] ; then
+    # Start interactive fish shell if TTY is available
+    /bin/fish && teardown
 else
-    # Daemonized mode, run an indefinite loop
-    while true; do sleep 86400; done
+    # Non-interactive mode - run main loop to keep the container alive
+    while true; do
+        sleep 1
+    done
 fi
-
-# Remove ephemeral Tailscale node
-teardown
