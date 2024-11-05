@@ -51,7 +51,8 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Install Ruby
 RUN rbenv install $(rbenv install -l | grep -v - | tail -1) && \
-    rbenv global $(rbenv install -l | grep -v - | tail -1)
+    rbenv global $(rbenv install -l | grep -v - | tail -1) && \
+    rbenv rehash
 
 # Install Node
 SHELL ["/bin/bash", "--login", "-c", "-i"]
