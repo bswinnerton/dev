@@ -34,6 +34,9 @@ RUN apt-get update && apt-get install -y \
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG=en_US.utf8
 
+# Set timezone
+RUN ln -fs /usr/share/zoneinfo/Etc/GMT-5 /etc/localtime
+
 # Install Tailscale
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /usr/local/bin/tailscaled
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscale /usr/local/bin/tailscale
