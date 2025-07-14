@@ -100,7 +100,7 @@ RUN mkdir -p /home/$USER/dev/neptune-networks && \
     git clone https://github.com/neptune-networks/containers.git && \
     git clone https://github.com/neptune-networks/infrastructure.git && \
     git clone https://github.com/neptune-networks/ipguide.git && \
-    git clone https://github.com/neptune-networks/neptune-networks.git && \
+    git clone https://github.com/neptune-networks/neptune.git && \
     git clone https://github.com/neptune-networks/network.git
 
 # Call the bootstrap script at runtime
