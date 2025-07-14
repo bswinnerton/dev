@@ -18,7 +18,7 @@ If you want to make a copy of this, you'll need to set a few secrets and reposit
 ### Repository variables
 
 - `CONTAINER_USER`: The name of the user you would like inside the container
-- `DOCKER_REGISTRY`: The URL of your private Docker registry (without a suffix like `https://`)
+- `DOCKER_REGISTRY_URL`: The URL of your private Docker registry (without a suffix like `https://`)
 - `DOCKER_USERNAME`: The username for your private Docker registry
 
 ## To build locally
