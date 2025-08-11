@@ -104,7 +104,7 @@ RUN mkdir -p /home/$USER/dev/neptune-networks && \
     git clone https://github.com/neptune-networks/network.git
 
 # Install Claude Code
-npm install -g @anthropic-ai/claude-code
+RUN npm install -g @anthropic-ai/claude-code
 
 # Call the bootstrap script at runtime
 WORKDIR /home/$USER/
