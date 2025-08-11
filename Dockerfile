@@ -62,7 +62,9 @@ SHELL ["/bin/bash", "--login", "-c", "-i"]
 RUN curl -fsSL https://fnm.vercel.app/install | bash && \
     source /home/$USER/.bashrc && \
     fnm install --lts && \
-    npm install -g yarn
+    npm install -g yarn && \
+    npm install -g @anthropic-ai/claude-code
+    
 SHELL ["/bin/bash", "--login", "-c"]
 
 # Import GPG key
@@ -102,9 +104,6 @@ RUN mkdir -p /home/$USER/dev/neptune-networks && \
     git clone https://github.com/neptune-networks/ipguide.git && \
     git clone https://github.com/neptune-networks/neptune.git && \
     git clone https://github.com/neptune-networks/network.git
-
-# Install Claude Code
-RUN npm install -g @anthropic-ai/claude-code
 
 # Call the bootstrap script at runtime
 WORKDIR /home/$USER/
