@@ -1,10 +1,20 @@
 FROM debian:latest
 SHELL ["/bin/bash", "--login", "-c"]
 
+# Install core dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg
+
+# Add Stripe apt source
+RUN curl -s https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | tee /usr/share/keyrings/stripe.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | tee -a /etc/apt/sources.list.d/stripe.list
+
 # Install dev tools
 RUN apt-get update && apt-get install -y \
-    curl \
     fish \
+    docker \
     dnsutils \
     git \
     golang \
@@ -23,6 +33,7 @@ RUN apt-get update && apt-get install -y \
     openssh-server \
     rbenv \
     ripgrep \
+    stripe \
     sudo \
     tcpdump \
     tmux \
@@ -38,7 +49,8 @@ RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG=en_US.utf8
 
 # Set timezone
-RUN ln -fs /usr/share/zoneinfo/Etc/GMT-5 /etc/localtime
+RUN echo "America/New_York" > /etc/timezone && \
+    ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
 
 # Install Tailscale
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /usr/local/bin/tailscaled
@@ -108,6 +120,10 @@ RUN mkdir -p /home/$USER/dev/neptune-networks && \
     git clone https://github.com/neptune-networks/ipguide.git && \
     git clone https://github.com/neptune-networks/neptune.git && \
     git clone https://github.com/neptune-networks/network.git
+
+# Install overmind
+RUN eval "$(rbenv init -)" && \
+    gem install overmind
 
 # Call the bootstrap script at runtime
 WORKDIR /home/$USER/
