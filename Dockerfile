@@ -7,14 +7,22 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg
 
-# Add Stripe apt source
+# Add Docker's official GPG key and repository
+RUN install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Add Stripe's official GPG key and repository
 RUN curl -s https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | tee /usr/share/keyrings/stripe.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | tee -a /etc/apt/sources.list.d/stripe.list
 
 # Install dev tools
 RUN apt-get update && apt-get install -y \
     fish \
-    docker \
+    docker-ce-cli \
     dnsutils \
     git \
     golang \
