@@ -31,6 +31,15 @@ git config --global user.email "$(echo $GITHUB_EMAILS | jq .[0].email)"
 git config --global github.user "$(echo $GITHUB_USER | jq .login)"
 git config --global sendemail.smtpUser "$(echo $GITHUB_EMAILS | jq .[0].email)"
 
+# Start PostgreSQL
+echo "Starting PostgreSQL..."
+sudo service postgresql start > /dev/null 2>&1
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" > /dev/null 2>&1 || true
+
+# Start Redis
+echo "Starting Redis..."
+sudo redis-server --daemonize yes > /dev/null 2>&1
+
 # Start Tailscale
 echo "Starting Tailscale..."
 sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &

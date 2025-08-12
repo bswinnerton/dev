@@ -39,7 +39,9 @@ RUN apt-get update && apt-get install -y \
     mosh \
     mtr \
     openssh-server \
+    postgresql \
     rbenv \
+    redis-server \
     ripgrep \
     stripe \
     sudo \
