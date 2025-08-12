@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     jq \
     libffi-dev \
+    libpq-dev \
+    libvirt-dev \
     libyaml-dev \
     locales \
     mosh \
