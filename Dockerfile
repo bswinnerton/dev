@@ -13,13 +13,14 @@ RUN apt-get update && apt-get install -y \
     iproute2 \
     iputils-ping \
     jq \
+    libffi-dev \
+    libyaml-dev \
     locales \
     mosh \
     mtr \
     openssh-server \
     rbenv \
     ripgrep \
-    ruby-build \
     sudo \
     tcpdump \
     tmux \
@@ -53,7 +54,8 @@ WORKDIR /home/$USER/
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Install Ruby
-RUN rbenv install $(rbenv install -l | grep -v - | tail -1) && \
+RUN git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build && \
+    rbenv install $(rbenv install -l | grep -v - | tail -1) && \
     rbenv global $(rbenv install -l | grep -v - | tail -1) && \
     rbenv rehash
 
@@ -64,7 +66,7 @@ RUN curl -fsSL https://fnm.vercel.app/install | bash && \
     fnm install --lts && \
     npm install -g yarn && \
     npm install -g @anthropic-ai/claude-code
-    
+
 SHELL ["/bin/bash", "--login", "-c"]
 
 # Import GPG key
