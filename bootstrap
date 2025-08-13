@@ -34,6 +34,7 @@ git config --global sendemail.smtpUser "$(echo $GITHUB_EMAILS | jq .[0].email)"
 # Start PostgreSQL
 echo "Starting PostgreSQL..."
 sudo service postgresql start > /dev/null 2>&1
+sudo -u postgres createuser -s $(whoami) > /dev/null 2>&1 || true
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';" > /dev/null 2>&1 || true
 
 # Start Redis
