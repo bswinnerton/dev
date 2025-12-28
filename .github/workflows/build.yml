@@ -27,6 +27,14 @@ jobs:
       - name: Build
         run: >
           docker build -t ${{ github.actor }}/dev:latest --build-arg USER=${{ vars.CONTAINER_USER }} .
+      - name: Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          hostname: bswinnerton-build-dev-${{ github.run_id }}
+          tags: tag:ci
+          version: latest
       - name: Tag
         run: docker tag ${{ github.actor }}/dev:latest ${{ vars.DOCKER_REGISTRY_URL }}/${{ github.actor }}/dev
       - name: Login
