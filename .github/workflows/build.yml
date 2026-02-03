@@ -33,7 +33,7 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           hostname: bswinnerton-build-dev-${{ github.run_id }}
-          tags: tag:ci
+          tags: tag:actions
           version: latest
       - name: Tag
         run: docker tag ${{ github.actor }}/dev:latest ${{ vars.DOCKER_REGISTRY_URL }}/${{ github.actor }}/dev
