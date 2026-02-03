@@ -88,8 +88,10 @@ SHELL ["/bin/bash", "--login", "-c", "-i"]
 RUN curl -fsSL https://fnm.vercel.app/install | bash && \
     source /home/$USER/.bashrc && \
     fnm install --lts && \
-    npm install -g yarn && \
-    npm install -g @anthropic-ai/claude-code
+    npm install -g yarn
+
+# Install Claude
+RUN curl -fsSL https://claude.ai/install.sh | bash
 
 SHELL ["/bin/bash", "--login", "-c"]
 
