@@ -46,6 +46,10 @@ echo "Starting Tailscale..."
 sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
 sudo tailscale up --operator=$(whoami) --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
 
+# Cache GPG passphrase for commit signing
+echo "Caching GPG passphrase..."
+echo "test" | gpg --clearsign > /dev/null
+
 # Check if a TTY is attached (i.e., `docker run -it`)
 if [ -t 0 ] ; then
     # Start interactive fish shell if TTY is available

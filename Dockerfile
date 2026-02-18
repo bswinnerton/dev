@@ -100,6 +100,8 @@ SHELL ["/bin/bash", "--login", "-c"]
 COPY gpg.key .
 RUN mkdir -p /home/$USER/.gnupg && \
     chmod 700 /home/$USER/.gnupg && \
+    echo "default-cache-ttl 31536000" > /home/$USER/.gnupg/gpg-agent.conf && \
+    echo "max-cache-ttl 31536000" >> /home/$USER/.gnupg/gpg-agent.conf && \
     gpg --batch --import gpg.key && \
     sudo rm gpg.key
 
