@@ -51,8 +51,9 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && rm -rf /var/lib/apt/lists*
 
 # Install Stripe CLI
-RUN STRIPE_VERSION=$(curl -s https://api.github.com/repos/stripe/stripe-cli/releases/latest | grep '"tag_name"' | cut -d'"' -f4 | sed 's/^v//') && \
-    curl -fsSL "https://github.com/stripe/stripe-cli/releases/download/v${STRIPE_VERSION}/stripe_${STRIPE_VERSION}_linux_$(dpkg --print-architecture).tar.gz" | tar -xz -C /usr/local/bin stripe
+RUN STRIPE_ARCH=$(dpkg --print-architecture | sed 's/amd64/x86_64/') && \
+    STRIPE_VERSION=$(curl -s https://api.github.com/repos/stripe/stripe-cli/releases/latest | grep '"tag_name"' | cut -d'"' -f4 | sed 's/^v//') && \
+    curl -fsSL "https://github.com/stripe/stripe-cli/releases/download/v${STRIPE_VERSION}/stripe_${STRIPE_VERSION}_linux_${STRIPE_ARCH}.tar.gz" | tar -xz -C /usr/local/bin stripe
 
 # Generate locales
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
