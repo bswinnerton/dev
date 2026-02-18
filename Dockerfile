@@ -15,16 +15,13 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Add Stripe's official GPG key and repository
-RUN curl -s https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | tee /usr/share/keyrings/stripe.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | tee -a /etc/apt/sources.list.d/stripe.list
-
 # Install dev tools
 RUN apt-get update && apt-get install -y \
     fish \
     docker-ce-cli \
     dnsutils \
     git \
+    gh \
     golang \
     htop \
     iperf3 \
@@ -43,7 +40,6 @@ RUN apt-get update && apt-get install -y \
     rbenv \
     redis-server \
     ripgrep \
-    stripe \
     sudo \
     tcpdump \
     tmux \
@@ -53,6 +49,10 @@ RUN apt-get update && apt-get install -y \
     wget && \
     # Clean up apt cache to save space
     apt-get clean && rm -rf /var/lib/apt/lists*
+
+# Install Stripe CLI
+RUN STRIPE_VERSION=$(curl -s https://api.github.com/repos/stripe/stripe-cli/releases/latest | grep '"tag_name"' | cut -d'"' -f4 | sed 's/^v//') && \
+    curl -fsSL "https://github.com/stripe/stripe-cli/releases/download/v${STRIPE_VERSION}/stripe_${STRIPE_VERSION}_linux_$(dpkg --print-architecture).tar.gz" | tar -xz -C /usr/local/bin stripe
 
 # Generate locales
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
