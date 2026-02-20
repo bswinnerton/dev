@@ -91,6 +91,9 @@ RUN curl -fsSL https://fnm.vercel.app/install | bash && \
     fnm install --lts && \
     npm install -g yarn
 
+# Install Playwright browsers and system dependencies
+RUN npx playwright install --with-deps
+
 # Install Claude
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
@@ -100,8 +103,6 @@ SHELL ["/bin/bash", "--login", "-c"]
 COPY gpg.key .
 RUN mkdir -p /home/$USER/.gnupg && \
     chmod 700 /home/$USER/.gnupg && \
-    echo "default-cache-ttl 31536000" > /home/$USER/.gnupg/gpg-agent.conf && \
-    echo "max-cache-ttl 31536000" >> /home/$USER/.gnupg/gpg-agent.conf && \
     gpg --batch --import gpg.key && \
     sudo rm gpg.key
 
@@ -119,6 +120,14 @@ RUN mkdir -p /home/$USER/dev/ && \
     ./install && \
     vim +'PlugInstall --sync' +qa
 SHELL ["/bin/bash", "--login", "-c"]
+
+# Configure gpg-agent (after dotfiles install which may overwrite .gnupg config)
+RUN echo "default-cache-ttl 31536000" > /home/$USER/.gnupg/gpg-agent.conf && \
+    echo "max-cache-ttl 31536000" >> /home/$USER/.gnupg/gpg-agent.conf && \
+    echo "allow-preset-passphrase" >> /home/$USER/.gnupg/gpg-agent.conf
+
+# Prompt for GPG passphrase on first interactive login
+COPY config/fish/conf.d/gpg.fish /home/$USER/.config/fish/conf.d/gpg.fish
 
 # Configure Git
 RUN git config --global user.signingkey $(gpg --homedir /home/$USER/.gnupg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2) && \
