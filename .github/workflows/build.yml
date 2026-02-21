@@ -24,9 +24,7 @@ jobs:
           cp env.example .env
           echo "GITHUB_TOKEN=${{ secrets.CONTAINER_GITHUB_TOKEN }}" >> .env
           echo "TAILSCALE_KEY=${{ secrets.CONTAINER_TAILSCALE_KEY }}" >> .env
-      - name: Create Claude credentials
-        run: |
-          echo '${{ secrets.CLAUDE_CREDENTIALS }}' > .claude-credentials.json
+          echo "CLAUDE_CODE_OAUTH_TOKEN=${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" >> .env
       - name: Build
         run: >
           docker build -t ${{ github.actor }}/dev:latest --build-arg USER=${{ vars.CONTAINER_USER }} .
