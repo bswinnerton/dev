@@ -97,6 +97,21 @@ RUN npx playwright install --with-deps
 # Install Claude
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
+# Install uv (provides uvx for Python-based MCP servers)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Make uv-installed tools and Go binaries discoverable on PATH
+ENV PATH=/home/$USER/.local/bin:/home/$USER/go/bin:$PATH
+
+# Install Loki MCP server (Go binary from scottlepp/loki-mcp)
+RUN go install github.com/scottlepp/loki-mcp/cmd/server@latest && \
+    sudo mv $HOME/go/bin/server /usr/local/bin/loki-mcp-server
+
+# Pre-install neptune MCP servers so first session doesn't pay the cold-install cost
+RUN uv tool install mcp-clickhouse && \
+    uv tool install postgres-mcp && \
+    uv tool install prometheus-mcp-server
+
 SHELL ["/bin/bash", "--login", "-c"]
 
 # Import GPG key

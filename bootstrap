@@ -46,6 +46,13 @@ echo "Starting Tailscale..."
 sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 > /dev/null 2>&1 &
 sudo tailscale up --operator=$(whoami) --auth-key=$TAILSCALE_KEY --accept-routes --ssh --hostname=dev
 
+# Start claude remote-control in the neptune project so claude.ai/code and the
+# Claude mobile app can attach to a session here. Backgrounded; tail the log
+# (~/.claude-remote-control.log) to see the session URL/QR.
+echo "Starting claude remote-control..."
+NEPTUNE_DIR="/home/$(whoami)/dev/neptune-networks/neptune"
+(cd "$NEPTUNE_DIR" && nohup claude remote-control --name dev >> ~/.claude-remote-control.log 2>&1 &)
+
 # Check if a TTY is attached (i.e., `docker run -it`)
 if [ -t 0 ] ; then
     # Start interactive fish shell if TTY is available
